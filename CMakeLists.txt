@@ -4,7 +4,7 @@ PROJECT(OpenscenegraphThirdParty)
 
 # Only enable release and debug builds
 IF(CMAKE_CONFIGURATION_TYPES)
-  SET(CMAKE_CONFIGURATION_TYPES Debug Release)
+  SET(CMAKE_CONFIGURATION_TYPES Release)
   SET(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
     "Reset the configurations to what we need"
     FORCE)
