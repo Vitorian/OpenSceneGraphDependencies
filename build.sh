@@ -1,4 +1,56 @@
 #!/bin/bash
+SCRIPTFILE="$(readlink -f $0)"
+SCRIPTDIR="$(basename $SCRIPTFILE)"
+
+if [ ! -d "$SCRIPTDIR/Tarball" ]; then
+	mkdir -p "$SCRIPTDIR/Tarball"
+fi
+
+############################################################################
+# Download dependencies
+# CURL FREETYPE GIFLIB GLUT JPEGSRC LIBPNG MINIZIP TIFF ZLIB
+CURL_VERSION="7.56.1"
+FREETYPE_VERSION="2.8.1"
+GIFLIB_VERSION="5.1.4"
+GLUT_VERSION=""
+JPEGSRC_VERSION=""
+LIBPNG_VERSION=""
+MINIZIP_VERSION=""
+TIFF_VERSION=""
+ZLIB_VERSION=""
+
+############################################################################
+# Curl 
+if [ ! -f "$SCRIPTDIR/Tarball/curl-${CURL_VERSION}.tar.gz" ]; then
+	wget "https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz" -O "$SCRIPTDIR/Tarball/curl-${CURL_VERSION}.tar.gz"
+fi
+rm -rf "curl-${CURL_VERSION}"
+tar xzvf "$SCRIPTDIR/Tarball/curl-${CURL_VERSION}.tar.gz" -C "$SCRIPTDIR"
+rsync -av "$SCRIPTDIR/curl-${CURL_VERSION}/" "$SCRIPTDIR/curl/"
+
+############################################################################
+# FreeType2
+if [ ! -f "$SCRIPTDIR/Tarball/freetype-${FREETYPE_VER}.tar.gz" ]; then
+	wget "https://sourceforge.net/projects/freetype/files/freetype2/${FREETYPE_VERSION}/freetype-${FREETYPE_VERSION}.tar.gz" -O "$SCRIPTDIR/Tarball/freetype-${FREETYPE_VERSION}.tar.gz"
+fi
+rm -rf freetype-${FREETYPE_VERSION}
+tar xzvf "$SCRIPTDIR/Tarball/freetype-${FREETYPE_VERSION}.tar.gz"	-C "$SCRIPTDIR"
+rsync -av "$SCRIPTDIR/freetype-${FREETYPE_VERSION}/" "$SCRIPTDIR/freetype/"
+
+############################################################################
+# Giflib
+if [ ! -f "$SCRIPTDIR/Tarball/freetype-${FREETYPE_VER}.tar.gz" ]; then
+	wget "https://sourceforge.net/projects/giflib/files/giflib-${GIFLIB_VERSION}.tar.gz" -O "$SCRIPTDIR/Tarball/giflib-${GIFLIB_VERSION}.tar.gz"
+fi
+rm -rf giflib-${GIFLIB_VERSION}
+tar xzvf "$SCRIPTDIR/Tarball/giflib-${GIFLIB_VERSION}.tar.gz"	-C "$SCRIPTDIR"
+rsync -av "$SCRIPTDIR/giflib-${GIFLIB_VERSION}/" "$SCRIPTDIR/giflib/"
+
+############################################################################
+# GLUT
+git clone https://github.com/markkilgard/glut glut.git
+git reset --hard 8cd96cb440f1f2fac3a154227937be39d06efa53
+
 
 if [ "x" == "x$VS140COMNTOOLS" ]; then
     echo "You need to have Visual Studio 14 (2015) installed (Env variable VS140COMNTOOLS does not exist)"
