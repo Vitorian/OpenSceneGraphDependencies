@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "x" == "x$VS140COMNTOOLS" ]; then
+    echo "You need to have Visual Studio 14 (2015) installed (Env variable VS140COMNTOOLS does not exist)"
+	exit 0
+fi
+
 function runbat()
 {
 echo "Running $*"
@@ -22,11 +27,13 @@ fi
 
 mkdir -p $SCRIPTDIR/build
 cd $SCRIPTDIR/build
-runbat which cmake
+
 runbat cmake -G \"Visual Studio 14 2015 Win64\" "$SCRIPTDIR_WIN"
 cd $SCRIPTDIR/build
 echo "Current directory: $PWD"
-runbat cmake -G \"Visual Studio 14 2015 Win64\" --build . --target ALL_BUILD
+runbat cmake --build . --config Release --target ALL_BUILD
+runbat cmake --build . --config Release --target INSTALL
+
 
 
 
