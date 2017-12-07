@@ -1,6 +1,20 @@
 #!/bin/bash
+# Open MSYS2 
+# ./build.sh 
+# If everything goes alright, the build code will be in $PWD/build/3rdParty/v140-x64/
+#
 SCRIPTFILE="$(readlink -f $0)"
-SCRIPTDIR="$(basename $SCRIPTFILE)"
+SCRIPTDIR="$(dirname $SCRIPTFILE)"
+SCRIPTDIR_WIN="$(cygpath -w "$SCRIPTDIR")"
+
+if [ "x" == "x$VS140COMNTOOLS" ]; then
+    echo "You need to have Visual Studio 14 (2015) installed (Env variable VS140COMNTOOLS does not exist)"
+	exit 0
+fi
+
+#echo "SCRIPTFILE:$SCRIPTFILE"
+#echo "SCRIPTDIR:$SCRIPTDIR"
+#exit 0
 
 if [ ! -d "$SCRIPTDIR/Tarball" ]; then
 	mkdir -p "$SCRIPTDIR/Tarball"
@@ -48,13 +62,8 @@ rsync -av "$SCRIPTDIR/giflib-${GIFLIB_VERSION}/" "$SCRIPTDIR/giflib/"
 
 ############################################################################
 # GLUT
-git clone https://github.com/markkilgard/glut glut.git
-git reset --hard 8cd96cb440f1f2fac3a154227937be39d06efa53
-
-
-if [ "x" == "x$VS140COMNTOOLS" ]; then
-    echo "You need to have Visual Studio 14 (2015) installed (Env variable VS140COMNTOOLS does not exist)"
-	exit 0
+if [ ! -d "$SCRIPTDIR/glut.git" ]; then
+	( cd "$SCRIPTDIR"; git clone https://github.com/markkilgard/glut glut.git; 	git reset --hard 8cd96cb440f1f2fac3a154227937be39d06efa53 )
 fi
 
 function runbat()
@@ -70,9 +79,6 @@ EOF
 cmd.exe /c "run.$$.bat"
 }
 
-SCRIPTNAME="$(readlink -f $0)"
-SCRIPTDIR="$(dirname "$SCRIPTNAME")"
-SCRIPTDIR_WIN="$(cygpath -w "$SCRIPTDIR")"
 if [ -d "SCRIPTDIR/build" ]; then
 	rm -rf $SCRIPTDIR/build
 fi

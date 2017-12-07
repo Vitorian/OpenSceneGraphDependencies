@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -34,12 +34,12 @@ size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream)
   return (nmemb*size);
 }
 
-static CURLcode sslctx_function(CURL * curl, void * sslctx, void * parm)
+static CURLcode sslctx_function(CURL *curl, void *sslctx, void *parm)
 {
-  X509_STORE * store;
-  X509 * cert=NULL;
-  BIO * bio;
-  char * mypem = /* www.cacert.org */
+  X509_STORE *store;
+  X509 *cert = NULL;
+  BIO *bio;
+  char *mypem = /* www.cacert.org */
     "-----BEGIN CERTIFICATE-----\n"\
     "MIIHPTCCBSWgAwIBAgIBADANBgkqhkiG9w0BAQQFADB5MRAwDgYDVQQKEwdSb290\n"\
     "IENBMR4wHAYDVQQLExVodHRwOi8vd3d3LmNhY2VydC5vcmcxIjAgBgNVBAMTGUNB\n"\
@@ -82,7 +82,7 @@ static CURLcode sslctx_function(CURL * curl, void * sslctx, void * parm)
     "omTxJBzcoTWcFbLUvFUufQb1nA5V9FrWk9p2rSVzTMVD\n"\
     "-----END CERTIFICATE-----\n";
   /* get a BIO */
-  bio=BIO_new_mem_buf(mypem, -1);
+  bio = BIO_new_mem_buf(mypem, -1);
   /* use it to read the PEM formatted certificate from memory into an X509
    * structure that SSL can use
    */
@@ -91,10 +91,10 @@ static CURLcode sslctx_function(CURL * curl, void * sslctx, void * parm)
     printf("PEM_read_bio_X509 failed...\n");
 
   /* get a pointer to the X509 certificate store (which may be empty!) */
-  store=SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
+  store = SSL_CTX_get_cert_store((SSL_CTX *)sslctx);
 
   /* add our certificate to this store */
-  if(X509_STORE_add_cert(store, cert)==0)
+  if(X509_STORE_add_cert(store, cert) == 0)
     printf("error adding certificate\n");
 
   /* decrease reference counts */
@@ -107,38 +107,38 @@ static CURLcode sslctx_function(CURL * curl, void * sslctx, void * parm)
 
 int main(void)
 {
-  CURL * ch;
+  CURL *ch;
   CURLcode rv;
 
-  rv=curl_global_init(CURL_GLOBAL_ALL);
-  ch=curl_easy_init();
-  rv=curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
-  rv=curl_easy_setopt(ch, CURLOPT_HEADER, 0L);
-  rv=curl_easy_setopt(ch, CURLOPT_NOPROGRESS, 1L);
-  rv=curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
-  rv=curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, *writefunction);
-  rv=curl_easy_setopt(ch, CURLOPT_WRITEDATA, stdout);
-  rv=curl_easy_setopt(ch, CURLOPT_HEADERFUNCTION, *writefunction);
-  rv=curl_easy_setopt(ch, CURLOPT_HEADERDATA, stderr);
-  rv=curl_easy_setopt(ch, CURLOPT_SSLCERTTYPE, "PEM");
-  rv=curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 1L);
-  rv=curl_easy_setopt(ch, CURLOPT_URL, "https://www.example.com/");
+  rv = curl_global_init(CURL_GLOBAL_ALL);
+  ch = curl_easy_init();
+  rv = curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
+  rv = curl_easy_setopt(ch, CURLOPT_HEADER, 0L);
+  rv = curl_easy_setopt(ch, CURLOPT_NOPROGRESS, 1L);
+  rv = curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
+  rv = curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, *writefunction);
+  rv = curl_easy_setopt(ch, CURLOPT_WRITEDATA, stdout);
+  rv = curl_easy_setopt(ch, CURLOPT_HEADERFUNCTION, *writefunction);
+  rv = curl_easy_setopt(ch, CURLOPT_HEADERDATA, stderr);
+  rv = curl_easy_setopt(ch, CURLOPT_SSLCERTTYPE, "PEM");
+  rv = curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 1L);
+  rv = curl_easy_setopt(ch, CURLOPT_URL, "https://www.example.com/");
 
   /* first try: retrieve page without cacerts' certificate -> will fail
    */
-  rv=curl_easy_perform(ch);
-  if(rv==CURLE_OK)
+  rv = curl_easy_perform(ch);
+  if(rv == CURLE_OK)
     printf("*** transfer succeeded ***\n");
   else
     printf("*** transfer failed ***\n");
 
   /* second try: retrieve page using cacerts' certificate -> will succeed
-   * load the certificate by installing a function doing the nescessary
+   * load the certificate by installing a function doing the necessary
    * "modifications" to the SSL CONTEXT just before link init
    */
-  rv=curl_easy_setopt(ch, CURLOPT_SSL_CTX_FUNCTION, *sslctx_function);
-  rv=curl_easy_perform(ch);
-  if(rv==CURLE_OK)
+  rv = curl_easy_setopt(ch, CURLOPT_SSL_CTX_FUNCTION, *sslctx_function);
+  rv = curl_easy_perform(ch);
+  if(rv == CURLE_OK)
     printf("*** transfer succeeded ***\n");
   else
     printf("*** transfer failed ***\n");

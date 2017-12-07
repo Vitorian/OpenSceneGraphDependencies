@@ -74,6 +74,8 @@ B) The request was HTTP and included digest details, which adds 1000 to NUM
 C) If a HTTP request is NTLM type-1, it adds 1001 to num
 D) If a HTTP request is NTLM type-3, it adds 1002 to num
 E) If a HTTP request is Basic and num is already >=1000, it adds 1 to num
+F) If a HTTP request is Negotiate, num gets incremented by one for each
+request with Negotiate authorization header on the same test case.
 
 Dynamically changing num in this way allows the test harness to be used to
 test authentication negotiation where several different requests must be sent
@@ -86,11 +88,18 @@ The connect section is used instead of the 'data' for all CONNECT
 requests. The remainder of the rules for the data section then apply but with
 a connect prefix.
 </connect>
-<datacheck [nonewline="yes"]>
+<datacheck [mode="text"] [nonewline="yes"]>
 if the data is sent but this is what should be checked afterwards. If
 'nonewline' is set, we will cut off the trailing newline of this given data
-before comparing with the one actually received by the client
+before comparing with the one actually received by the client.
+
+Use the mode="text" attribute if the output is in text mode on platforms that
+have a text/binary difference.
 </datacheck>
+<datacheckNUM [nonewline="yes"] [mode="text"]>
+The contents of numbered datacheck sections are appended to the non-numbered
+one.
+</datacheckNUM>
 <size>
 number to return on a ftp SIZE command (set to -1 to make this command fail)
 </size>
@@ -176,11 +185,13 @@ ftp-ipv6
 ftps
 http
 http-ipv6
+http-pipe
 http-proxy
 http-unix
 https
 httptls+srp
 httptls+srp-ipv6
+http/2
 imap
 none
 pop3
@@ -230,9 +241,11 @@ SSLpinning
 SSPI
 TLS-SRP
 TrackMemory
+threaded-resolver
 unittest
 unix-sockets
 WinSSL
+ld_preload
 
 as well as each protocol that curl supports.  A protocol only needs to be
 specified if it is different from the server (useful when the server
@@ -426,8 +439,9 @@ have a text/binary difference.
 Variables are substituted as in the <command> section.
 </file>
 <stripfile>
-One perl op per line that operates on the file before being compared. This is
-pretty advanced. Example: "s/^EPRT .*/EPRT stripped/"
+One perl op per line that operates on the output file or stdout before being
+compared with what is stored in the test file. This is pretty
+advanced. Example: "s/^EPRT .*/EPRT stripped/"
 </stripfile>
 <upload>
 the contents of the upload data curl should have sent

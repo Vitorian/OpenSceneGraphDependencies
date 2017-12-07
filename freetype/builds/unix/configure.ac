@@ -2,7 +2,7 @@
 #
 # Process this file with autoconf to produce a configure script.
 #
-# Copyright 2001-2015 by
+# Copyright 2001-2017 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -11,13 +11,13 @@
 # indicate that you have read the license and understand and accept it
 # fully.
 
-AC_INIT([FreeType], [2.6.1], [freetype@nongnu.org], [freetype])
+AC_INIT([FreeType], [2.8.1], [freetype@nongnu.org], [freetype])
 AC_CONFIG_SRCDIR([ftconfig.in])
 
 
-# Don't forget to update docs/VERSION.DLL!
+# Don't forget to update `docs/VERSIONS.TXT'!
 
-version_info='18:1:12'
+version_info='21:0:15'
 AC_SUBST([version_info])
 ft_version=`echo $version_info | tr : .`
 AC_SUBST([ft_version])
@@ -70,24 +70,25 @@ AC_SUBST(CC_BUILD)
 AC_SUBST(EXEEXT_BUILD)
 
 
-# Since this file will be finally moved to another directory we make
-# the path of the install scripts absolute.  This small code snippet has
-# been taken from automake's `ylwrap' script.
+# Since these files will be eventually called from another directory (namely
+# from the top level) we make the path of the scripts absolute.
+#
+# This small code snippet has been taken from automake's `ylwrap' script.
 
 AC_PROG_INSTALL
 case "$INSTALL" in
-[\\/]* | ?:[\\/]*)
+[[\\/]]* | ?:[[\\/]]*)
   ;;
-*[\\/]*)
+*[[\\/]]*)
   INSTALL="`pwd`/$INSTALL"
   ;;
 esac
 
 AC_PROG_MKDIR_P
 case "$MKDIR_P" in
-[\\/]* | ?:[\\/]*)
+[[\\/]]* | ?:[[\\/]]*)
   ;;
-*[\\/]*)
+*[[\\/]]*)
   MKDIR_P="`pwd`/$MKDIR_P"
   ;;
 esac
@@ -104,6 +105,7 @@ AC_CHECK_HEADERS([fcntl.h unistd.h])
 AC_C_CONST
 AC_CHECK_SIZEOF([int])
 AC_CHECK_SIZEOF([long])
+AC_TYPE_LONG_LONG_INT
 
 
 # check whether cpp computation of size of int and long in ftconfig.in works
@@ -179,6 +181,8 @@ CPPFLAGS="${orig_CPPFLAGS}"
 
 # checks for library functions
 
+AC_SYS_LARGEFILE
+
 # Here we check whether we can use our mmap file component.
 
 AC_ARG_ENABLE([mmap],
@@ -234,6 +238,9 @@ if test "x$GCC" = xyes; then
   *-*-mingw*)
     XX_ANSIFLAGS="-pedantic"
     ;;
+  *-*-aix*)
+    XX_ANSIFLAGS="-pedantic"
+    ;;
   *)
     GCC_VERSION=`$CC -dumpversion`
     GCC_MAJOR=`echo "$GCC_VERSION" | sed 's/\([[^.]][[^.]]*\).*/\1/'`
@@ -268,7 +275,7 @@ if test "x$GCC" = xyes; then
             }
 
           ])],
-        [AC_MSG_RESULT([ok, add it to XX_ANSIFLAGS])
+        [AC_MSG_RESULT([ok, adding to XX_ANSIFLAGS])
          XX_ANSIFLAGS="${XX_ANSIFLAGS} ${a}"
         ],
         [AC_MSG_RESULT([no])])
